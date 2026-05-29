@@ -149,13 +149,15 @@ async function parseApiResponse<T>(response: Response): Promise<T> {
   }
 
   if (!response.ok) {
-    const errMsg = parsed && typeof parsed === "object" && "error" in parsed
-      ? typeof parsed.error === "string"
-        ? parsed.error
-        : parsed.error && typeof parsed.error === "object" && "message" in parsed.error && typeof parsed.error.message === "string"
-          ? parsed.error.message
-          : "Request failed."
-      : "Request failed.";
+    let errMsg = "Request failed.";
+    if (parsed && typeof parsed === "object" && "error" in parsed) {
+      const apiError = parsed.error;
+      if (typeof apiError === "string") {
+        errMsg = apiError;
+      } else if (apiError && typeof apiError === "object" && "message" in apiError && typeof apiError.message === "string") {
+        errMsg = apiError.message;
+      }
+    }
     throw new Error(errMsg);
   }
 
@@ -761,11 +763,11 @@ export default function CaptureFlowApp() {
         const compositeArtifact: KnowledgeArtifact = {
           ...synthesized,
           metadata: {
-            priority: synthesized.metadata?.priority || "Medium",
-            technologiesOrPlatforms: synthesized.metadata?.technologiesOrPlatforms || "N/A",
-            actioneesOrSpeakers: synthesized.metadata?.actioneesOrSpeakers || "N/A",
-            timeContext: synthesized.metadata?.timeContext || "N/A",
-            estimatedValueGauge: synthesized.metadata?.estimatedValueGauge || "Synthesized cluster"
+            priority: synthesized.metadata?.priority ?? "Medium",
+            technologiesOrPlatforms: synthesized.metadata?.technologiesOrPlatforms ?? "N/A",
+            actioneesOrSpeakers: synthesized.metadata?.actioneesOrSpeakers ?? "N/A",
+            timeContext: synthesized.metadata?.timeContext ?? "N/A",
+            estimatedValueGauge: synthesized.metadata?.estimatedValueGauge ?? "Synthesized cluster"
           },
           id: newId,
           capturedAt: new Date().toISOString(),

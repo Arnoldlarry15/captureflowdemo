@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const { artifacts } = await req.json();
 
     if (!artifacts || !Array.isArray(artifacts) || artifacts.length < 2) {
-      return NextResponse.json(
+      return NextResponse.json<ApiResponse<AutoSynthesizePayload>>(
         {
           ok: false,
           error: { message: "At least two artifacts are required for automated synthesis detection." }
