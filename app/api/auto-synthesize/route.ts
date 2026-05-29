@@ -1,6 +1,7 @@
 import { Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 import { generateContentWithRetry } from "../../../lib/gemini-runner";
+import type { ApiResponse, AutoSynthesizePayload } from "@/lib/api-contracts";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -11,7 +12,10 @@ export async function POST(req: NextRequest) {
 
     if (!artifacts || !Array.isArray(artifacts) || artifacts.length < 2) {
       return NextResponse.json(
-        { error: "At least two artifacts are required for automated synthesis detection." },
+        {
+          ok: false,
+          error: { message: "At least two artifacts are required for automated synthesis detection." }
+        },
         { status: 400 }
       );
     }
@@ -113,15 +117,21 @@ ${indexSummary}`;
       throw new Error("No response content from automated synthesize AI model.");
     }
 
-    const parsedData = JSON.parse(textOutput.trim());
-    return NextResponse.json(parsedData);
+    const parsedData = JSON.parse(textOutput.trim()) as AutoSynthesizePayload;
+    return NextResponse.json<ApiResponse<AutoSynthesizePayload>>({
+      ok: true,
+      data: parsedData
+    });
 
   } catch (error: any) {
     console.error("Automated synthesis execution error:", error);
-    return NextResponse.json(
+    return NextResponse.json<ApiResponse<AutoSynthesizePayload>>(
       {
-        error: "Failed to automatically combine and condense matching artifacts.",
-        details: error?.message || String(error)
+        ok: false,
+        error: {
+          message: "Failed to automatically combine and condense matching artifacts.",
+          details: error?.message || String(error)
+        }
       },
       { status: 500 }
     );

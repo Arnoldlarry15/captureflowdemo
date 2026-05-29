@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
+import type { ApiResponse, AutoSynthesizePayload, CaptureArtifactPayload } from "@/lib/api-contracts";
 import { 
   Crop, 
   Terminal, 
@@ -134,6 +135,31 @@ function generateUniqueId(prefix: string, indexOffset = 0): string {
   const timestamp = typeof Date !== "undefined" ? Date.now() : Math.floor(Math.random() * 1000000);
   const randNum = Math.floor(Math.random() * 10000);
   return `${prefix}-${timestamp}-${randNum}-${indexOffset}`;
+}
+
+async function parseApiResponse<T>(response: Response): Promise<T> {
+  const parsed = await response.json();
+
+  if (parsed && typeof parsed === "object" && "ok" in parsed) {
+    const apiResponse = parsed as ApiResponse<T>;
+    if (apiResponse.ok) {
+      return apiResponse.data;
+    }
+    throw new Error(apiResponse.error.message || "Request failed.");
+  }
+
+  if (!response.ok) {
+    const errMsg = parsed && typeof parsed === "object" && "error" in parsed
+      ? typeof parsed.error === "string"
+        ? parsed.error
+        : parsed.error && typeof parsed.error === "object" && "message" in parsed.error && typeof parsed.error.message === "string"
+          ? parsed.error.message
+          : "Request failed."
+      : "Request failed.";
+    throw new Error(errMsg);
+  }
+
+  return parsed as T;
 }
 
 export default function CaptureFlowApp() {
@@ -289,11 +315,7 @@ export default function CaptureFlowApp() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Gemini extraction error.");
-      }
-
-      const rawExtract = await response.json();
+      const rawExtract = await parseApiResponse<CaptureArtifactPayload>(response);
       const uniqueId = generateUniqueId("art-dispatched");
       
       const novelArtifact: KnowledgeArtifact = {
@@ -492,11 +514,7 @@ export default function CaptureFlowApp() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Gemini background handler yielded error code.");
-      }
-
-      const rawExtract = await response.json();
+      const rawExtract = await parseApiResponse<CaptureArtifactPayload>(response);
       const uniqueId = generateUniqueId("art-dispatched");
       
       const novelArtifact: KnowledgeArtifact = {
@@ -725,15 +743,7 @@ export default function CaptureFlowApp() {
         body: JSON.stringify({ artifacts })
       });
 
-      if (!res.ok) {
-        throw new Error("Automated synthesis query failed.");
-      }
-
-      const parsed = await res.json();
-      if (parsed.error) {
-        throw new Error(parsed.error);
-      }
-
+      const parsed = await parseApiResponse<AutoSynthesizePayload>(res);
       const groups = parsed.synthesizedGroups || [];
       if (groups.length === 0) {
         triggerSystemAlert("Gemini examined all segments and found no related subjects/use that require combined synthesis.", "info");
