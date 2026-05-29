@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 45 530 270" width="100%" height="100%">
+  <defs>
+    <!-- CaptureFlow Primary Color Gradients -->
+    <linearGradient id="cfGradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff" />
+      <stop offset="40%" stop-color="#00b4d8" />
+      <stop offset="100%" stop-color="#0077b6" />
+    </linearGradient>
+    <linearGradient id="cfGradSecondary" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#03045e" />
+      <stop offset="50%" stop-color="#0077b6" />
+      <stop offset="100%" stop-color="#00b4d8" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#00b4d8" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <g transform="translate(10, 0)">
+    <!-- Base Glow Behind Loop -->
+    <circle cx="170" cy="170" r="85" fill="url(#glowGrad)" filter="url(#glowEffect)" opacity="0.35" />
+
+    <!-- Outer Swirling Flow Wave 1 -->
+    <path d="M 130,222 C 70,185 85,95 160,85 C 240,75 290,135 325,185 C 360,235 410,260 450,215" 
+          fill="none" stroke="url(#cfGradPrimary)" stroke-width="15" stroke-linecap="round" opacity="0.4" />
+
+    <!-- Connected Node Dots/Constellation representing "Capture" (Cognitive Capture) -->
+    <g>
+      <!-- Connection lines -->
+      <path d="M 175,120 Q 130,145 135,190 T 180,240" fill="none" stroke="#00ffff" stroke-width="4.5" opacity="0.75" />
+      <line x1="175" y1="120" x2="135" y2="190" stroke="#00ffff" stroke-width="3" opacity="0.5" />
+      <line x1="135" y1="190" x2="180" y2="240" stroke="#00ffff" stroke-width="3" opacity="0.5" />
+
+      <!-- Node 1 -->
+      <circle cx="175" cy="120" r="10" fill="#00ffff" stroke="#03045e" stroke-width="3" filter="url(#glowEffect)" />
+      <circle cx="175" cy="120" r="4" fill="#ffffff" />
+
+      <!-- Node 2 -->
+      <circle cx="135" cy="190" r="10" fill="#00b4d8" stroke="#03045e" stroke-width="3" filter="url(#glowEffect)" />
+      <circle cx="135" cy="190" r="4" fill="#ffffff" />
+
+      <!-- Node 3 -->
+      <circle cx="180" cy="240" r="10" fill="#0077b6" stroke="#03045e" stroke-width="3" filter="url(#glowEffect)" />
+      <circle cx="180" cy="240" r="4" fill="#ffffff" />
+    </g>
+
+    <!-- Flow Loop Ribbon representing "Flow" (Cognitive Flow) -->
+    <!-- Swirl wrapping on itself and leading into arrow -->
+    <path d="M 190,250 C 250,250 310,180 360,130 C 410,80 470,95 490,125 C 502,143 490,170 450,195 C 410,220 340,190 300,145 C 260,100 190,50 120,95 C 60,135 65,225 130,265 C 200,310 280,285 350,225 C 400,182 460,165 520,175" 
+          fill="none" stroke="url(#cfGradPrimary)" stroke-width="19" stroke-linecap="round" />
+
+    <!-- Inner Core Highlight Streak for extra polished depth -->
+    <path d="M 125,100 C 65,140 70,220 130,260 C 190,300 270,280 340,220 C 390,178 450,160 510,170" 
+          fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.65" />
+
+    <!-- Top Flow Swoosh with Arrow Head -->
+    <path d="M 330,120 C 385,60 450,45 500,75 L 535,95" 
+          fill="none" stroke="url(#cfGradSecondary)" stroke-width="12" stroke-linecap="round" />
+    
+    <!-- Bold Tech Arrow pointing up right -->
+    <path d="M 505,52 L 565,95 L 515,130 Z" fill="#00ffff" filter="url(#glowEffect)" opacity="0.9" />
+    <path d="M 505,52 L 565,95 L 515,130 Z" fill="#ffffff" />
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+{
+  "name": "CaptureFlowDemo",
+  "description": "System-wide capture and go cognitive offloading tool that extracts structured knowledge near-instantly.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
