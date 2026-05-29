@@ -757,8 +757,16 @@ export default function CaptureFlowApp() {
       for (let i = 0; i < groups.length; i++) {
         const group = groups[i];
         const newId = generateUniqueId("art-auto-condensed", i);
+        const synthesized = group.synthesizedArtifact;
         const compositeArtifact: KnowledgeArtifact = {
-          ...group.synthesizedArtifact,
+          ...synthesized,
+          metadata: {
+            priority: synthesized.metadata?.priority || "Medium",
+            technologiesOrPlatforms: synthesized.metadata?.technologiesOrPlatforms || "N/A",
+            actioneesOrSpeakers: synthesized.metadata?.actioneesOrSpeakers || "N/A",
+            timeContext: synthesized.metadata?.timeContext || "N/A",
+            estimatedValueGauge: synthesized.metadata?.estimatedValueGauge || "Synthesized cluster"
+          },
           id: newId,
           capturedAt: new Date().toISOString(),
           sourceApp: "Automated Gemini Cognitive Engine"
