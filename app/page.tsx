@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
+import type { ApiResponse, AutoSynthesizePayload, CaptureArtifactPayload } from "@/lib/api-contracts";
 import { 
   Crop, 
   Terminal, 
@@ -134,6 +135,49 @@ function generateUniqueId(prefix: string, indexOffset = 0): string {
   const timestamp = typeof Date !== "undefined" ? Date.now() : Math.floor(Math.random() * 1000000);
   const randNum = Math.floor(Math.random() * 10000);
   return `${prefix}-${timestamp}-${randNum}-${indexOffset}`;
+}
+
+async function parseApiResponse<T>(response: Response): Promise<T> {
+  const responseText = await response.text();
+  let parsed: unknown = null;
+  if (responseText) {
+    try {
+      parsed = JSON.parse(responseText);
+    } catch {
+      parsed = responseText;
+    }
+  }
+
+  if (parsed && typeof parsed === "object" && "ok" in parsed) {
+    const apiResponse = parsed as ApiResponse<T>;
+    if (apiResponse.ok) {
+      return apiResponse.data;
+    }
+    throw new Error(apiResponse.error.message || "Request failed.");
+  }
+
+  if (!response.ok) {
+    let errMsg = "Request failed.";
+    if (parsed && typeof parsed === "object" && "error" in parsed) {
+      const apiError = parsed.error;
+      if (typeof apiError === "string") {
+        errMsg = apiError;
+      } else if (apiError && typeof apiError === "object" && "message" in apiError && typeof apiError.message === "string") {
+        errMsg = apiError.message;
+      }
+    } else if (typeof parsed === "string" && parsed.trim()) {
+      errMsg = parsed.trim();
+    } else if (response.statusText) {
+      errMsg = response.statusText;
+    }
+    throw new Error(errMsg);
+  }
+
+  if (parsed && typeof parsed === "object") {
+    return parsed as T;
+  }
+
+  throw new Error("Unexpected response format from API.");
 }
 
 export default function CaptureFlowApp() {
@@ -289,11 +333,7 @@ export default function CaptureFlowApp() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Gemini extraction error.");
-      }
-
-      const rawExtract = await response.json();
+      const rawExtract = await parseApiResponse<CaptureArtifactPayload>(response);
       const uniqueId = generateUniqueId("art-dispatched");
       
       const novelArtifact: KnowledgeArtifact = {
@@ -492,11 +532,7 @@ export default function CaptureFlowApp() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Gemini background handler yielded error code.");
-      }
-
-      const rawExtract = await response.json();
+      const rawExtract = await parseApiResponse<CaptureArtifactPayload>(response);
       const uniqueId = generateUniqueId("art-dispatched");
       
       const novelArtifact: KnowledgeArtifact = {
@@ -725,15 +761,7 @@ export default function CaptureFlowApp() {
         body: JSON.stringify({ artifacts })
       });
 
-      if (!res.ok) {
-        throw new Error("Automated synthesis query failed.");
-      }
-
-      const parsed = await res.json();
-      if (parsed.error) {
-        throw new Error(parsed.error);
-      }
-
+      const parsed = await parseApiResponse<AutoSynthesizePayload>(res);
       const groups = parsed.synthesizedGroups || [];
       if (groups.length === 0) {
         triggerSystemAlert("Gemini examined all segments and found no related subjects/use that require combined synthesis.", "info");
@@ -747,8 +775,16 @@ export default function CaptureFlowApp() {
       for (let i = 0; i < groups.length; i++) {
         const group = groups[i];
         const newId = generateUniqueId("art-auto-condensed", i);
+        const synthesized = group.synthesizedArtifact;
         const compositeArtifact: KnowledgeArtifact = {
-          ...group.synthesizedArtifact,
+          ...synthesized,
+          metadata: {
+            priority: synthesized.metadata?.priority ?? "Medium",
+            technologiesOrPlatforms: synthesized.metadata?.technologiesOrPlatforms ?? "N/A",
+            actioneesOrSpeakers: synthesized.metadata?.actioneesOrSpeakers ?? "N/A",
+            timeContext: synthesized.metadata?.timeContext ?? "N/A",
+            estimatedValueGauge: synthesized.metadata?.estimatedValueGauge ?? "Synthesized cluster"
+          },
           id: newId,
           capturedAt: new Date().toISOString(),
           sourceApp: "Automated Gemini Cognitive Engine"
