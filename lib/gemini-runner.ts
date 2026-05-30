@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
 // Graceful Lazy initialization of GenAI Client
 let aiClient: GoogleGenAI | null = null;
@@ -51,10 +51,15 @@ export async function generateContentWithRetry({
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         console.log(`[GeminiRunner] Attempting generateContent. Model: ${currentModel}, Attempt: ${attempt}/${maxRetries}`);
+        // Optimize thinking level for ultra-low latency and fast data extraction
+        const optimizedConfig = {
+          ...config,
+          thinkingConfig: config?.thinkingConfig || { thinkingLevel: ThinkingLevel.LOW }
+        };
         const response = await ai.models.generateContent({
           model: currentModel,
           contents,
-          config,
+          config: optimizedConfig,
         });
         
         if (response && response.text) {

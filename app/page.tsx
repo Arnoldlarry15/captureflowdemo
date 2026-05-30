@@ -458,7 +458,8 @@ export default function CaptureFlowApp() {
     const w = Math.abs(captureCurrentPos.x - captureStartPos.x);
     const h = Math.abs(captureCurrentPos.y - captureStartPos.y);
 
-    if (w < 20 || h < 20) {
+    // Guard against accidental single clicks (where both dimensions are tiny), but allow thin or narrow selections
+    if (w < 5 && h < 5) {
       triggerSystemAlert("Cropping zone too small. Please drag a larger selection segment.", "error");
       return;
     }
