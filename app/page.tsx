@@ -999,7 +999,7 @@ export default function CaptureFlowApp() {
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center relative">
               <Image 
-                src="/logo.svg" 
+                src="https://github.com/user-attachments/assets/cb40b5ab-815c-40d1-87e5-70abf7e91e38" 
                 alt="CaptureFlow Logo" 
                 width={32}
                 height={32}

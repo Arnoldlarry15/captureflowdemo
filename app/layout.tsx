@@ -20,6 +20,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'CaptureFlow — Cognitive Offloading Primitive',
   description: 'Instant screen selection capturing and AI cognitive extraction system.',
+  icons: {
+    icon: 'https://github.com/user-attachments/assets/cb40b5ab-815c-40d1-87e5-70abf7e91e38',
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
@@ -31,4 +34,3 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     </html>
   );
 }
-
