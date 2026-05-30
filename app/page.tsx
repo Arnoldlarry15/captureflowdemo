@@ -1375,6 +1375,13 @@ export default function CaptureFlowApp() {
                   </button>
                 )}
                 <button
+                  onClick={() => { startCaptureFlow(); }}
+                  className="w-full text-left px-3 py-2 hover:bg-slate-850 rounded-lg flex items-center gap-2 text-slate-300 font-semibold"
+                >
+                  <Crop size={12} className="text-blue-400" />
+                  📸 Regular Capture
+                </button>
+                <button
                   onClick={() => {
                     const fullContext = `
 SYSTEM COMPILER LOGS:
@@ -1396,7 +1403,7 @@ The cognitive performance layer represents a major development boundary. Models 
                   className="w-full text-left px-3 py-2 hover:bg-slate-850 rounded-lg flex items-center gap-2 text-slate-200 font-semibold"
                 >
                   <Crop size={12} className="text-blue-400" />
-                  📸 Capture Screen (All Text)
+                  📸 Capture Screen
                 </button>
                 <button
                   onClick={() => { setIsDbOpen(true); setContextMenu(null); }}
@@ -1405,15 +1412,6 @@ The cognitive performance layer represents a major development boundary. Models 
                   <Database size={12} className="text-emerald-400" />
                   📂 Open Retrieval Vault
                 </button>
-                {isCrashActive && (
-                  <button
-                    onClick={() => { setIsCrashActive(false); setContextMenu(null); }}
-                    className="w-full text-left px-3 py-2 hover:bg-slate-850 rounded-lg flex items-center gap-2 text-slate-400"
-                  >
-                    <Check size={12} className="text-blue-500" />
-                    Apply AI hotfix directly
-                  </button>
-                )}
                 <div className="border-t border-slate-850 my-1 pb-1" />
                 <button
                   onClick={() => { setArtifacts(INITIAL_ARTIFACTS); triggerSystemAlert("Database reset completed.", "info"); }}
