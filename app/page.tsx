@@ -138,7 +138,15 @@ function generateUniqueId(prefix: string, indexOffset = 0): string {
 }
 
 async function parseApiResponse<T>(response: Response): Promise<T> {
-  const parsed = await response.json();
+  const responseText = await response.text();
+  let parsed: unknown = null;
+  if (responseText) {
+    try {
+      parsed = JSON.parse(responseText);
+    } catch {
+      parsed = responseText;
+    }
+  }
 
   if (parsed && typeof parsed === "object" && "ok" in parsed) {
     const apiResponse = parsed as ApiResponse<T>;
@@ -157,11 +165,19 @@ async function parseApiResponse<T>(response: Response): Promise<T> {
       } else if (apiError && typeof apiError === "object" && "message" in apiError && typeof apiError.message === "string") {
         errMsg = apiError.message;
       }
+    } else if (typeof parsed === "string" && parsed.trim()) {
+      errMsg = parsed.trim();
+    } else if (response.statusText) {
+      errMsg = response.statusText;
     }
     throw new Error(errMsg);
   }
 
-  return parsed as T;
+  if (parsed && typeof parsed === "object") {
+    return parsed as T;
+  }
+
+  throw new Error("Invalid JSON response.");
 }
 
 export default function CaptureFlowApp() {
