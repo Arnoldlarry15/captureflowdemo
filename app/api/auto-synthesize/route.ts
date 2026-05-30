@@ -130,7 +130,9 @@ ${indexSummary}`;
         ok: false,
         error: {
           message: "Failed to automatically combine and condense matching artifacts.",
-          details: error?.message || String(error)
+          ...(process.env.NODE_ENV === "development"
+            ? { details: error?.message || String(error) }
+            : {})
         }
       },
       { status: 500 }

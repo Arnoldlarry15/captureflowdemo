@@ -123,7 +123,9 @@ Format the returned JSON according to the schema provided.`
         ok: false,
         error: {
           message: "Failed to extract cognitive data.",
-          details: error?.message || String(error)
+          ...(process.env.NODE_ENV === "development"
+            ? { details: error?.message || String(error) }
+            : {})
         }
       },
       { status: 500 }
