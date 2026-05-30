@@ -177,7 +177,7 @@ async function parseApiResponse<T>(response: Response): Promise<T> {
     return parsed as T;
   }
 
-  throw new Error("Invalid JSON response.");
+  throw new Error("Unexpected response format from API.");
 }
 
 export default function CaptureFlowApp() {
