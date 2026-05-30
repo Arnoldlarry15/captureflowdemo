@@ -1,7 +1,6 @@
 import { Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 import { generateContentWithRetry } from "../../../lib/gemini-runner";
-import type { ApiResponse, CaptureArtifactPayload } from "@/lib/api-contracts";
 
 export async function POST(req: NextRequest) {
   try {
@@ -107,23 +106,15 @@ Format the returned JSON according to the schema provided.`
       throw new Error("No response text from Gemini API");
     }
 
-    const parsedData = JSON.parse(textOutput.trim()) as CaptureArtifactPayload;
-    return NextResponse.json<ApiResponse<CaptureArtifactPayload>>({
-      ok: true,
-      data: parsedData
-    });
+    const parsedData = JSON.parse(textOutput.trim());
+    return NextResponse.json(parsedData);
 
   } catch (error: any) {
     console.error("Capture Flow extraction error:", error);
-    return NextResponse.json<ApiResponse<CaptureArtifactPayload>>(
+    return NextResponse.json(
       {
-        ok: false,
-        error: {
-          message: "Failed to extract cognitive data.",
-          ...(process.env.NODE_ENV === "development"
-            ? { details: error?.message || String(error) }
-            : {})
-        }
+        error: "Failed to extract cognitive data.",
+        details: error?.message || String(error)
       },
       { status: 500 }
     );
